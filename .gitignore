@@ -1,0 +1,7 @@
+/.vs
+*.sln
+*.csproj
+*.user
+
+/COMports/bin
+/COMports/obj
