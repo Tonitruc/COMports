@@ -51,8 +51,7 @@ namespace COMports
                 Parity = Parity.None,
                 DataBits = 8,
                 StopBits = StopBits.One,
-                Handshake = Handshake.None,
-                Encoding = Encoding.UTF8
+
             };
 
             port.DataReceived += DataReceivedHandler;

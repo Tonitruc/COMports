@@ -33,16 +33,27 @@
             panel2 = new Panel();
             outputTextBox = new TextBox();
             panel3 = new Panel();
-            amountServingLabel = new Label();
-            label4 = new Label();
             outputComboBox = new ComboBox();
             inputComboBox = new ComboBox();
+            amountServingLabel = new Label();
             label1 = new Label();
             label3 = new Label();
             label2 = new Label();
+            panel4 = new Panel();
+            label10 = new Label();
+            label9 = new Label();
+            label8 = new Label();
+            label7 = new Label();
+            label6 = new Label();
+            label5 = new Label();
+            label11 = new Label();
+            label12 = new Label();
+            label13 = new Label();
+            label4 = new Label();
             panel1.SuspendLayout();
             panel2.SuspendLayout();
             panel3.SuspendLayout();
+            panel4.SuspendLayout();
             SuspendLayout();
             // 
             // panel1
@@ -70,7 +81,7 @@
             panel2.BackColor = SystemColors.Highlight;
             panel2.BorderStyle = BorderStyle.FixedSingle;
             panel2.Controls.Add(outputTextBox);
-            panel2.Location = new Point(286, 140);
+            panel2.Location = new Point(246, 140);
             panel2.Name = "panel2";
             panel2.Size = new Size(170, 150);
             panel2.TabIndex = 1;
@@ -89,40 +100,19 @@
             // panel3
             // 
             panel3.BackColor = SystemColors.GradientActiveCaption;
-            panel3.Controls.Add(amountServingLabel);
-            panel3.Controls.Add(label4);
             panel3.Controls.Add(outputComboBox);
+            panel3.Controls.Add(label2);
             panel3.Controls.Add(inputComboBox);
-            panel3.Location = new Point(31, 33);
+            panel3.Location = new Point(31, 25);
             panel3.Name = "panel3";
-            panel3.Size = new Size(420, 75);
+            panel3.Size = new Size(380, 83);
             panel3.TabIndex = 2;
-            // 
-            // amountServingLabel
-            // 
-            amountServingLabel.AutoSize = true;
-            amountServingLabel.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold | FontStyle.Italic, GraphicsUnit.Point, 204);
-            amountServingLabel.Location = new Point(260, 45);
-            amountServingLabel.Name = "amountServingLabel";
-            amountServingLabel.Size = new Size(18, 20);
-            amountServingLabel.TabIndex = 3;
-            amountServingLabel.Text = "0";
-            // 
-            // label4
-            // 
-            label4.AutoSize = true;
-            label4.Font = new Font("Segoe UI", 9F, FontStyle.Bold | FontStyle.Italic, GraphicsUnit.Point, 204);
-            label4.Location = new Point(17, 45);
-            label4.Name = "label4";
-            label4.Size = new Size(238, 20);
-            label4.TabIndex = 2;
-            label4.Text = "Количество порций символов:";
             // 
             // outputComboBox
             // 
             outputComboBox.FormattingEnabled = true;
             outputComboBox.Items.AddRange(new object[] { "COM1", "COM2", "COM3", "COM4" });
-            outputComboBox.Location = new Point(277, 11);
+            outputComboBox.Location = new Point(230, 36);
             outputComboBox.Name = "outputComboBox";
             outputComboBox.Size = new Size(125, 28);
             outputComboBox.TabIndex = 1;
@@ -132,11 +122,21 @@
             // 
             inputComboBox.FormattingEnabled = true;
             inputComboBox.Items.AddRange(new object[] { "COM1", "COM2", "COM3", "COM4" });
-            inputComboBox.Location = new Point(17, 11);
+            inputComboBox.Location = new Point(17, 36);
             inputComboBox.Name = "inputComboBox";
             inputComboBox.Size = new Size(125, 28);
             inputComboBox.TabIndex = 0;
             inputComboBox.SelectedIndexChanged += inputComboBox_SelectedIndexChanged;
+            // 
+            // amountServingLabel
+            // 
+            amountServingLabel.AutoSize = true;
+            amountServingLabel.Font = new Font("Sylfaen", 10.8F, FontStyle.Italic);
+            amountServingLabel.Location = new Point(260, 150);
+            amountServingLabel.Name = "amountServingLabel";
+            amountServingLabel.Size = new Size(19, 23);
+            amountServingLabel.TabIndex = 3;
+            amountServingLabel.Text = "0";
             // 
             // label1
             // 
@@ -154,7 +154,7 @@
             label3.AutoSize = true;
             label3.BackColor = SystemColors.ActiveCaption;
             label3.Font = new Font("Sylfaen", 12F, FontStyle.Bold, GraphicsUnit.Point, 204);
-            label3.Location = new Point(301, 111);
+            label3.Location = new Point(261, 111);
             label3.Name = "label3";
             label3.Size = new Size(140, 26);
             label3.TabIndex = 3;
@@ -164,19 +164,138 @@
             // 
             label2.AutoSize = true;
             label2.Font = new Font("Sylfaen", 12F, FontStyle.Bold, GraphicsUnit.Point, 204);
-            label2.Location = new Point(148, 4);
+            label2.Location = new Point(102, 2);
             label2.Name = "label2";
             label2.Size = new Size(186, 26);
             label2.TabIndex = 4;
             label2.Text = "Окно управления";
+            // 
+            // panel4
+            // 
+            panel4.BackColor = SystemColors.GradientActiveCaption;
+            panel4.Controls.Add(label4);
+            panel4.Controls.Add(label13);
+            panel4.Controls.Add(label12);
+            panel4.Controls.Add(label11);
+            panel4.Controls.Add(label10);
+            panel4.Controls.Add(amountServingLabel);
+            panel4.Controls.Add(label9);
+            panel4.Controls.Add(label8);
+            panel4.Controls.Add(label7);
+            panel4.Controls.Add(label6);
+            panel4.Controls.Add(label5);
+            panel4.Location = new Point(31, 306);
+            panel4.Name = "panel4";
+            panel4.Size = new Size(385, 185);
+            panel4.TabIndex = 5;
+            // 
+            // label10
+            // 
+            label10.AutoSize = true;
+            label10.Font = new Font("Sylfaen", 10.8F, FontStyle.Italic, GraphicsUnit.Point, 204);
+            label10.Location = new Point(99, 120);
+            label10.Name = "label10";
+            label10.Size = new Size(19, 23);
+            label10.TabIndex = 5;
+            label10.Text = "0";
+            // 
+            // label9
+            // 
+            label9.AutoSize = true;
+            label9.Font = new Font("Sylfaen", 10.8F);
+            label9.Location = new Point(17, 150);
+            label9.Name = "label9";
+            label9.Size = new Size(240, 23);
+            label9.TabIndex = 4;
+            label9.Text = "Количество порций символов:";
+            // 
+            // label8
+            // 
+            label8.AutoSize = true;
+            label8.Font = new Font("Sylfaen", 10.8F);
+            label8.Location = new Point(17, 120);
+            label8.Name = "label8";
+            label8.Size = new Size(79, 23);
+            label8.TabIndex = 3;
+            label8.Text = "Паритет:";
+            // 
+            // label7
+            // 
+            label7.AutoSize = true;
+            label7.Font = new Font("Sylfaen", 10.8F);
+            label7.Location = new Point(17, 90);
+            label7.Name = "label7";
+            label7.Size = new Size(84, 23);
+            label7.TabIndex = 2;
+            label7.Text = "Стоп бит:";
+            // 
+            // label6
+            // 
+            label6.AutoSize = true;
+            label6.Font = new Font("Sylfaen", 10.8F);
+            label6.Location = new Point(17, 60);
+            label6.Name = "label6";
+            label6.Size = new Size(158, 23);
+            label6.TabIndex = 1;
+            label6.Text = "Количество битов: ";
+            // 
+            // label5
+            // 
+            label5.AutoSize = true;
+            label5.Font = new Font("Sylfaen", 10.8F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            label5.Location = new Point(17, 30);
+            label5.Name = "label5";
+            label5.Size = new Size(87, 23);
+            label5.TabIndex = 0;
+            label5.Text = "Скорость:";
+            // 
+            // label11
+            // 
+            label11.AutoSize = true;
+            label11.Font = new Font("Sylfaen", 10.8F, FontStyle.Italic, GraphicsUnit.Point, 204);
+            label11.Location = new Point(104, 90);
+            label11.Name = "label11";
+            label11.Size = new Size(19, 23);
+            label11.TabIndex = 6;
+            label11.Text = "1";
+            // 
+            // label12
+            // 
+            label12.AutoSize = true;
+            label12.Font = new Font("Sylfaen", 10.8F, FontStyle.Italic, GraphicsUnit.Point, 204);
+            label12.Location = new Point(178, 60);
+            label12.Name = "label12";
+            label12.Size = new Size(19, 23);
+            label12.TabIndex = 7;
+            label12.Text = "1";
+            // 
+            // label13
+            // 
+            label13.AutoSize = true;
+            label13.Font = new Font("Sylfaen", 10.8F, FontStyle.Italic, GraphicsUnit.Point, 204);
+            label13.Location = new Point(107, 30);
+            label13.Name = "label13";
+            label13.Size = new Size(46, 23);
+            label13.TabIndex = 8;
+            label13.Text = "9600";
+            // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.Font = new Font("Sylfaen", 12F, FontStyle.Bold, GraphicsUnit.Point, 204);
+            label4.Location = new Point(110, 4);
+            label4.Name = "label4";
+            label4.Size = new Size(169, 26);
+            label4.TabIndex = 9;
+            label4.Text = "Окно состояния";
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ActiveCaption;
-            ClientSize = new Size(482, 303);
-            Controls.Add(label2);
+            ClientSize = new Size(442, 503);
+            Controls.Add(panel4);
             Controls.Add(label3);
             Controls.Add(label1);
             Controls.Add(panel3);
@@ -193,6 +312,8 @@
             panel2.PerformLayout();
             panel3.ResumeLayout(false);
             panel3.PerformLayout();
+            panel4.ResumeLayout(false);
+            panel4.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -209,7 +330,17 @@
         private ComboBox outputComboBox;
         private Label label2;
         private Label label3;
-        private Label label4;
         private Label amountServingLabel;
+        private Panel panel4;
+        private Label label5;
+        private Label label6;
+        private Label label7;
+        private Label label9;
+        private Label label8;
+        private Label label10;
+        private Label label13;
+        private Label label12;
+        private Label label11;
+        private Label label4;
     }
 }
