@@ -128,7 +128,7 @@ namespace COMports
         {
             var port = new SerialPort()
             {
-                BaudRate = 9600,
+                BaudRate = 100,
                 Parity = Parity.None,
                 StopBits = StopBits.One,
                 DataBits = 8,
@@ -166,36 +166,45 @@ namespace COMports
                     return;
                 }
 
-                var frames = ByteStaffingConverter.CreateFrames(dataToSend, GetComportNumber(_inputComPort.PortName));
-                int currentSym = 0;
-                byteStaffingOutput.Clear();
-                foreach(var frame in frames)
-                {
-                    byteStaffingOutput.AppendText(frame);
-                    for (int i = 4*2; i < frame.Length - 2; i+=2)
-                    {
-                        if(frame.Substring(i, 2) == ByteStaffingConverter.ReplaceCode.ToString("X"))
-                        {
-                            byteStaffingOutput.Select(currentSym + i, 4);
-                            byteStaffingOutput.SelectionColor = Color.Red;
-                            i += 2;
-                        }
-                    }
-                    currentSym += frame.Length;
-                    byteStaffingOutput.AppendText(Environment.NewLine);
-                    currentSym += 1;
-                }
-
-                string data = "";
-                foreach(var frame in frames)
-                {
-                    data += frame;
-                }
+                string data = RecolorReplacesBytes(dataToSend);
 
                 _inputComPort.Write(data);
 
                 inputTextBox.Clear();
             }
+        }
+
+        private string RecolorReplacesBytes(string dataToSend)
+        {
+            var frames = ByteStaffingConverter.CreateFrames(dataToSend, GetComportNumber(_inputComPort.PortName));
+            int currentSym = 0;
+            byteStaffingOutput.Clear();
+            foreach (var frame in frames)
+            {
+                string test = ByteStaffingConverter.SeparateData(frame);
+                byteStaffingOutput.AppendText(test);
+                for (int i = 4 * 3; i < test.Length - 3; i += 3)
+                {
+                    if (test.Substring(i, 2) == ByteStaffingConverter.ReplaceCode.ToString("X"))
+                    {
+                        byteStaffingOutput.Select(currentSym + i, 6);
+                        byteStaffingOutput.SelectionColor = Color.Red;
+                        i += 3;
+                    }
+                }
+                currentSym += test.Length;
+                byteStaffingOutput.AppendText(Environment.NewLine);
+                currentSym += 1;
+            }
+
+            string data = "";
+            foreach (var frame in frames)
+            {
+                data += frame;
+            }
+
+            return data;
+
         }
 
         private void DataReceivedHandler(object sender,

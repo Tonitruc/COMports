@@ -28,8 +28,6 @@ namespace COMports
         public static List<string> CreateFrames(string data, int sourcePort, int destinationPort = 0,
             string separator = "")
         {
-            string result = string.Empty;
-
             List<string> frames = [];
 
             for (int i = 0; i < data.Length; i += AmountBytesInFrame)
@@ -46,9 +44,8 @@ namespace COMports
         public static string CreateFrame(string data, int sourcePort, int destinationPort = 0,
             string separator = "")
         {
-            byte[] test = StartFlag;
             string frame = $"{StartFlag[0]:X2}" + $"{StartFlag[1]:X2}"
-                + $"{sourcePort:X2}" + $"{destinationPort:X2}";
+                + $"{destinationPort:X2}" + $"{sourcePort:X2}";
 
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             Encoding cp866 = Encoding.GetEncoding(866);
@@ -59,8 +56,7 @@ namespace COMports
 
                 if (b < bytes.Length - 1 && bytes[b] == StartFlag[0] && bytes[b + 1] == StartFlag[1])
                 {
-                    frame += $"{ReplacementBytes[StartFlag[0]][0]:X2}{ReplacementBytes[StartFlag[0]][1]:X2}"
-                        + $"{ReplacementBytes[StartFlag[1]][0]:X2}{ReplacementBytes[StartFlag[1]][1]:X2}";
+                    frame += "7D5D";
                     b++;
                 }
                 else if (b < bytes.Length && bytes[b] == ReplaceCode)
@@ -80,6 +76,24 @@ namespace COMports
             return frame;
         }
 
+        public static string SeparateData(string data, string separator = " ")
+        {
+            string code = string.Empty;
+            List<string> bytes = [];
+            for(int i = 0; i < data.Length; i+= 2)
+            {
+                bytes.Add(data.Substring(i, 2));
+            }
+
+            string result = string.Empty;
+            for(int i = 0; i < bytes.Count; i++)
+            {
+                result += bytes[i] + separator;
+            }
+
+            return result;
+        }
+
         public static string GetData(string staffedBytes)
         {
             List<string> frames = staffedBytes.Split("4069").ToList();
@@ -88,7 +102,7 @@ namespace COMports
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             Encoding cp866 = Encoding.GetEncoding(866);
 
-            string test = "";
+            string temp = "";
             foreach (string frame in frames)
             {
                 string data = "";
@@ -104,11 +118,7 @@ namespace COMports
                             hexByte = dataFrame.Substring(i, 2);
                             if(hexByte == "5D")
                             {
-                                data += "@";
-                            }
-                            else if(hexByte == "5E")
-                            {
-                                data += "i";
+                                data += "@i";
                             }
                             else if (hexByte == "5F")
                             {
@@ -123,10 +133,10 @@ namespace COMports
                         data += result;
                     }
                 }
-                test += data;
+                temp += data;
             }
 
-            return test;
+            return temp;
         }
     }
 }

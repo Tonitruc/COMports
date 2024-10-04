@@ -232,9 +232,9 @@
             label18.Font = new Font("Sylfaen", 10.8F);
             label18.Location = new Point(21, 25);
             label18.Name = "label18";
-            label18.Size = new Size(145, 23);
+            label18.Size = new Size(154, 23);
             label18.TabIndex = 13;
-            label18.Text = "Струтура кадров:";
+            label18.Text = "Структура кадров:";
             // 
             // panel5
             // 
@@ -260,7 +260,7 @@
             label17.AutoSize = true;
             label17.BackColor = Color.Transparent;
             label17.Font = new Font("Sylfaen", 10.8F, FontStyle.Italic);
-            label17.Location = new Point(469, 211);
+            label17.Location = new Point(405, 243);
             label17.Name = "label17";
             label17.Size = new Size(40, 23);
             label17.TabIndex = 11;
@@ -312,7 +312,7 @@
             // 
             label12.AutoSize = true;
             label12.Font = new Font("Sylfaen", 10.8F, FontStyle.Italic, GraphicsUnit.Point, 204);
-            label12.Location = new Point(405, 243);
+            label12.Location = new Point(471, 211);
             label12.Name = "label12";
             label12.Size = new Size(19, 23);
             label12.TabIndex = 7;
