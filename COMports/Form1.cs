@@ -1,12 +1,15 @@
+using System.Collections.Generic;
+using System.Drawing;
 using System.IO.Ports;
 using System.Text;
+using System.Windows.Forms;
 
 namespace COMports
 {
     public partial class Form1 : Form
     {
-        private SerialPort _inputComPort;
-        private SerialPort _outputComPort;
+        private readonly SerialPort _inputComPort;
+        private readonly SerialPort _outputComPort;
 
         private int _amountServing = 0;
 
@@ -51,7 +54,7 @@ namespace COMports
 
         private async void inputComboBox_DropDown(object? sender, EventArgs e)
         {
-            string? currentSelection = inputComboBox.SelectedItem?.ToString();
+            string currentSelection = inputComboBox.SelectedItem?.ToString() ?? "";
             inputComboBox.Items.Clear();
             List<string> avaliablePorts = await GetAvaliableComports(currentSelection);
             string selectedPort = outputComboBox.SelectedItem?.ToString() ?? string.Empty;
@@ -67,7 +70,7 @@ namespace COMports
 
         private async void outputComboBox_DropDown(object? sender, EventArgs e)
         {
-            string? currentSelection = outputComboBox.SelectedItem?.ToString();
+            string currentSelection = outputComboBox.SelectedItem?.ToString() ?? "";
             outputComboBox.Items.Clear();
             List<string> avaliablePorts = await GetAvaliableComports(currentSelection);
             string selectedPort = inputComboBox.SelectedItem?.ToString() ?? string.Empty;
@@ -145,11 +148,15 @@ namespace COMports
                 if (!_inputComPort.IsOpen)
                 {
                     MessageBox.Show("Выберите порт для передачи данных.", "Ошибка");
-                    if (!string.IsNullOrEmpty(dataToSend))
+                    if (!string.IsNullOrWhiteSpace(dataToSend))
                     {
                         inputTextBox.Text = inputTextBox.Text.Substring(0, inputTextBox.Text.Length - 1);
                         inputTextBox.SelectionStart = inputTextBox.Text.Length;
                         inputTextBox.SelectionLength = 0;
+                    }
+                    else
+                    {
+                        inputTextBox.Clear();
                     }
                     return;
                 }
@@ -159,7 +166,33 @@ namespace COMports
                     return;
                 }
 
-                _inputComPort.Write(dataToSend);
+                var frames = ByteStaffingConverter.CreateFrames(dataToSend, GetComportNumber(_inputComPort.PortName));
+                int currentSym = 0;
+                byteStaffingOutput.Clear();
+                foreach(var frame in frames)
+                {
+                    byteStaffingOutput.AppendText(frame);
+                    for (int i = 4*2; i < frame.Length - 2; i+=2)
+                    {
+                        if(frame.Substring(i, 2) == ByteStaffingConverter.ReplaceCode.ToString("X"))
+                        {
+                            byteStaffingOutput.Select(currentSym + i, 4);
+                            byteStaffingOutput.SelectionColor = Color.Red;
+                            i += 2;
+                        }
+                    }
+                    currentSym += frame.Length;
+                    byteStaffingOutput.AppendText(Environment.NewLine);
+                    currentSym += 1;
+                }
+
+                string data = "";
+                foreach(var frame in frames)
+                {
+                    data += frame;
+                }
+
+                _inputComPort.Write(data);
 
                 inputTextBox.Clear();
             }
@@ -180,7 +213,7 @@ namespace COMports
                 {
                     _amountServing++;
                     amountServingLabel.Text = _amountServing.ToString();
-                    outputTextBox.Text = dataReceived;
+                    outputTextBox.Text = ByteStaffingConverter.GetData(dataReceived);
                     outputTextBox.SelectionStart = outputTextBox.Text.Length;
                     outputTextBox.ScrollToCaret();
                 }));
