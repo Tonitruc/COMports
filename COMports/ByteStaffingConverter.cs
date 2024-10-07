@@ -4,126 +4,100 @@ namespace COMports
 {
     public static class ByteStaffingConverter
     {
-        public const int AmountBytesInFrame = 9;
+        public const int AmountDataBytes = 9;
 
         public static byte[] StartFlag
         {
             get
             {
-                Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
                 Encoding cp866 = Encoding.GetEncoding(866);
-                string test = $"@{(char)('a' + (AmountBytesInFrame - 1))}";
+                string test = $"@{(char)('a' + (AmountDataBytes - 1))}";
                 return cp866.GetBytes(test);
             }
         }
 
         public const byte ReplaceCode = 0x7D;
 
-        public static Dictionary<byte, byte[]> ReplacementBytes = new() {
-            {StartFlag[0], [ReplaceCode, 0x5D] },
-            {StartFlag[1], [ReplaceCode, 0x5E] },
-            {ReplaceCode, [ReplaceCode, 0x5F] } };
-
-
-        public static List<string> CreateFrames(string data, int sourcePort, int destinationPort = 0,
-            string separator = "")
+        public static List<string> CreateFrames(string data, int sourcePort, int destinationPort = 0)
         {
             List<string> frames = [];
 
-            for (int i = 0; i < data.Length; i += AmountBytesInFrame)
+            for (int i = 0; i < data.Length; i += AmountDataBytes)
             {
-                int lenght = Math.Min(AmountBytesInFrame, data.Length - i);
+                int lenght = Math.Min(AmountDataBytes, data.Length - i);
                 string frameData = data.Substring(i, lenght);
-                string frame = CreateFrame(frameData, sourcePort, destinationPort, separator);
+                string frame = CreateFrame(frameData, sourcePort, destinationPort);
                 frames.Add(frame);
             }
 
             return frames;
         }
 
-        public static string CreateFrame(string data, int sourcePort, int destinationPort = 0,
-            string separator = "")
+        public static string CreateFrame(string data, int sourcePort, int destinationPort = 0)
         {
             string frame = $"{StartFlag[0]:X2}" + $"{StartFlag[1]:X2}"
                 + $"{destinationPort:X2}" + $"{sourcePort:X2}";
 
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             Encoding cp866 = Encoding.GetEncoding(866);
             byte[] bytes = cp866.GetBytes(data);
 
-            for (int b = 0; b <= AmountBytesInFrame; b++)
+            for (int b = 0; b <= AmountDataBytes; b++)
             {
-
                 if (b < bytes.Length - 1 && bytes[b] == StartFlag[0] && bytes[b + 1] == StartFlag[1])
                 {
-                    frame += "7D5D";
+                    frame += $"{ReplaceCode:X2}5D";
                     b++;
                 }
                 else if (b < bytes.Length && bytes[b] == ReplaceCode)
                 {
-                    frame += $"{ReplacementBytes[ReplaceCode][0]:X2}{ReplacementBytes[ReplaceCode][1]:X2}";
-                }
-                else if (b < bytes.Length)
-                {
-                    frame += $"{bytes[b]:X2}";
+                    frame += $"{ReplaceCode:X2}5E";
                 }
                 else
                 {
-                    frame += $"{0:X2}";
+                    frame += b < bytes.Length ? $"{bytes[b]:X2}" : $"{0:X2}";
                 }
             }
 
             return frame;
         }
 
-        public static string SeparateData(string data, string separator = " ")
+        public static string SeparateBytes(string frame)
         {
-            string code = string.Empty;
-            List<string> bytes = [];
-            for(int i = 0; i < data.Length; i+= 2)
+            StringBuilder sb = new StringBuilder(frame);
+            for(int i = 2; i <  frame.Length; i+=2)
             {
-                bytes.Add(data.Substring(i, 2));
+                sb.Insert(i, " ");
             }
 
-            string result = string.Empty;
-            for(int i = 0; i < bytes.Count; i++)
-            {
-                result += bytes[i] + separator;
-            }
-
-            return result;
+            return sb.ToString();
         }
 
         public static string GetData(string staffedBytes)
         {
-            List<string> frames = staffedBytes.Split("4069").ToList();
+            List<string> frames = new(staffedBytes.Split($"{StartFlag[0]:X2}{StartFlag[1]:X2}"));
             frames.RemoveAt(0);
 
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             Encoding cp866 = Encoding.GetEncoding(866);
 
             string temp = "";
             foreach (string frame in frames)
             {
                 string data = "";
-                string dataFrame = frame.Substring(4);
+                string dataFrame = frame[4..^0];
                 for(int i = 0; i < dataFrame.Length - 2; i+=2)
                 {
                     string hexByte = dataFrame.Substring(i, 2);
-                    if(hexByte == "7D")
+                    if(hexByte == $"{ReplaceCode:X2}")
                     {
-                        if(i < dataFrame.Length - 4)
+                        i+= 2;
+                        hexByte = dataFrame.Substring(i, 2);
+                        if(hexByte == "5D")
                         {
-                            i+= 2;
-                            hexByte = dataFrame.Substring(i, 2);
-                            if(hexByte == "5D")
-                            {
-                                data += "@i";
-                            }
-                            else if (hexByte == "5F")
-                            {
-                                data += "}";
-                            }
+                            data += "@i";
+                        }
+                        else if (hexByte == "5E")
+                        {
+                            data += "}";
                         }
                     }
                     else

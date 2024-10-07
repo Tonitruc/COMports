@@ -16,8 +16,9 @@ namespace COMports
         public Form1()
         {
             InitializeComponent();
-            this.FormClosing += new FormClosingEventHandler(Form1_FormClosing);
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
+            this.FormClosing += new FormClosingEventHandler(Form1_FormClosing);
             this.KeyPreview = true;
             this.KeyDown += new KeyEventHandler(Form1_KeyDown);
             _inputComPort = BaseComportConfiguration();
@@ -59,7 +60,7 @@ namespace COMports
             List<string> avaliablePorts = await GetAvaliableComports(currentSelection);
             string selectedPort = outputComboBox.SelectedItem?.ToString() ?? string.Empty;
             inputComboBox.Items.AddRange(avaliablePorts.ToArray());
-            inputComboBox.Items.Remove("COM" + (GetComportNumber(selectedPort) - 1));
+            //inputComboBox.Items.Remove("COM" + (GetComportNumber(selectedPort) - 1));
             inputComboBox.Items.Insert(0, "Не выбран");
             if (!inputComboBox.Items.Contains(currentSelection))
             {
@@ -75,7 +76,7 @@ namespace COMports
             List<string> avaliablePorts = await GetAvaliableComports(currentSelection);
             string selectedPort = inputComboBox.SelectedItem?.ToString() ?? string.Empty;
             outputComboBox.Items.AddRange(avaliablePorts.ToArray());
-            outputComboBox.Items.Remove("COM" + (GetComportNumber(selectedPort) + 1));
+            //outputComboBox.Items.Remove("COM" + (GetComportNumber(selectedPort) + 1));
             outputComboBox.Items.Insert(0, "Не выбран");
             if (!outputComboBox.Items.Contains(currentSelection))
             {
@@ -166,7 +167,14 @@ namespace COMports
                     return;
                 }
 
-                string data = RecolorReplacesBytes(dataToSend);
+                var frames = ByteStaffingConverter.CreateFrames(dataToSend, GetComportNumber(_inputComPort.PortName));
+                RecolorReplacesBytes(frames);
+
+                string data = string.Empty;
+                foreach (var frame in frames)
+                {
+                    data += frame;
+                }
 
                 _inputComPort.Write(data);
 
@@ -174,37 +182,28 @@ namespace COMports
             }
         }
 
-        private string RecolorReplacesBytes(string dataToSend)
+        private void RecolorReplacesBytes(List<string> dataToSend, string sp = " ")
         {
-            var frames = ByteStaffingConverter.CreateFrames(dataToSend, GetComportNumber(_inputComPort.PortName));
-            int currentSym = 0;
+            var frames = dataToSend;
             byteStaffingOutput.Clear();
             foreach (var frame in frames)
             {
-                string test = ByteStaffingConverter.SeparateData(frame);
-                byteStaffingOutput.AppendText(test);
-                for (int i = 4 * 3; i < test.Length - 3; i += 3)
+                for (int i = 0; i < frame.Length; i += 2)
                 {
-                    if (test.Substring(i, 2) == ByteStaffingConverter.ReplaceCode.ToString("X"))
+                    byteStaffingOutput.AppendText(frame.Substring(i, 2) + sp);
+                    if (frame.Substring(i, 2) == ByteStaffingConverter.ReplaceCode.ToString("X"))
                     {
-                        byteStaffingOutput.Select(currentSym + i, 6);
+                        i += 2;
+                        byteStaffingOutput.AppendText(frame.Substring(i, 2) + sp);
+                        int textLength = byteStaffingOutput.TextLength;
+                        byteStaffingOutput.Select(textLength - 4 - 2 * sp.Length, 4 + 2 * sp.Length);
                         byteStaffingOutput.SelectionColor = Color.Red;
-                        i += 3;
+                        byteStaffingOutput.Select(textLength, 0);
+                        byteStaffingOutput.SelectionColor = byteStaffingOutput.ForeColor;
                     }
                 }
-                currentSym += test.Length;
                 byteStaffingOutput.AppendText(Environment.NewLine);
-                currentSym += 1;
             }
-
-            string data = "";
-            foreach (var frame in frames)
-            {
-                data += frame;
-            }
-
-            return data;
-
         }
 
         private void DataReceivedHandler(object sender,
