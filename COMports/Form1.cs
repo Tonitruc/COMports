@@ -60,7 +60,7 @@ namespace COMports
             List<string> avaliablePorts = await GetAvaliableComports(currentSelection);
             string selectedPort = outputComboBox.SelectedItem?.ToString() ?? string.Empty;
             inputComboBox.Items.AddRange(avaliablePorts.ToArray());
-            //inputComboBox.Items.Remove("COM" + (GetComportNumber(selectedPort) - 1));
+            inputComboBox.Items.Remove("COM" + (GetComportNumber(selectedPort) - 1));
             inputComboBox.Items.Insert(0, "Не выбран");
             if (!inputComboBox.Items.Contains(currentSelection))
             {
@@ -76,7 +76,7 @@ namespace COMports
             List<string> avaliablePorts = await GetAvaliableComports(currentSelection);
             string selectedPort = inputComboBox.SelectedItem?.ToString() ?? string.Empty;
             outputComboBox.Items.AddRange(avaliablePorts.ToArray());
-            //outputComboBox.Items.Remove("COM" + (GetComportNumber(selectedPort) + 1));
+            outputComboBox.Items.Remove("COM" + (GetComportNumber(selectedPort) + 1));
             outputComboBox.Items.Insert(0, "Не выбран");
             if (!outputComboBox.Items.Contains(currentSelection))
             {

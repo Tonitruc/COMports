@@ -61,17 +61,6 @@ namespace COMports
             return frame;
         }
 
-        public static string SeparateBytes(string frame)
-        {
-            StringBuilder sb = new StringBuilder(frame);
-            for(int i = 2; i <  frame.Length; i+=2)
-            {
-                sb.Insert(i, " ");
-            }
-
-            return sb.ToString();
-        }
-
         public static string GetData(string staffedBytes)
         {
             List<string> frames = new(staffedBytes.Split($"{StartFlag[0]:X2}{StartFlag[1]:X2}"));
@@ -79,10 +68,10 @@ namespace COMports
 
             Encoding cp866 = Encoding.GetEncoding(866);
 
-            string temp = "";
+            string temp = string.Empty;
             foreach (string frame in frames)
             {
-                string data = "";
+                string data = string.Empty;
                 string dataFrame = frame[4..^0];
                 for(int i = 0; i < dataFrame.Length - 2; i+=2)
                 {
