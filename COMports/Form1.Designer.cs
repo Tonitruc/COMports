@@ -251,6 +251,7 @@
             byteStaffingOutput.BorderStyle = BorderStyle.FixedSingle;
             byteStaffingOutput.Location = new Point(3, 3);
             byteStaffingOutput.Name = "byteStaffingOutput";
+            byteStaffingOutput.ReadOnly = true;
             byteStaffingOutput.Size = new Size(527, 107);
             byteStaffingOutput.TabIndex = 1;
             byteStaffingOutput.Text = "";

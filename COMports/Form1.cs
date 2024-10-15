@@ -17,7 +17,7 @@ namespace COMports
         {
             InitializeComponent();
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-
+           
             this.FormClosing += new FormClosingEventHandler(Form1_FormClosing);
             this.KeyPreview = true;
             this.KeyDown += new KeyEventHandler(Form1_KeyDown);
@@ -182,9 +182,8 @@ namespace COMports
             }
         }
 
-        private void RecolorReplacesBytes(List<string> dataToSend, string sp = " ")
+        private void RecolorReplacesBytes(List<string> frames, string sp = " ")
         {
-            var frames = dataToSend;
             byteStaffingOutput.Clear();
             foreach (var frame in frames)
             {
