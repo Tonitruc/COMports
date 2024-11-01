@@ -169,10 +169,10 @@ namespace COMports
 
                 var frames = ByteStaffingConverter.CreateFrames(dataToSend, GetComportNumber(_inputComPort.PortName));
                 RecolorReplacesBytes(frames);
-
                 string data = string.Empty;
                 foreach (var frame in frames)
                 {
+                    //Coding.CreateMistake(frame);
                     data += frame;
                 }
 
@@ -190,7 +190,7 @@ namespace COMports
                 for (int i = 0; i < frame.Length; i += 2)
                 {
                     byteStaffingOutput.AppendText(frame.Substring(i, 2) + sp);
-                    if (frame.Substring(i, 2) == ByteStaffingConverter.ReplaceCode.ToString("X"))
+                    if (i != frame.Length - 2 && frame.Substring(i, 2) == ByteStaffingConverter.ReplaceCode.ToString("X"))
                     {
                         i += 2;
                         byteStaffingOutput.AppendText(frame.Substring(i, 2) + sp);

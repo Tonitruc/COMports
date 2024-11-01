@@ -41,7 +41,7 @@ namespace COMports
             Encoding cp866 = Encoding.GetEncoding(866);
             byte[] bytes = cp866.GetBytes(data);
 
-            for (int b = 0; b <= AmountDataBytes; b++)
+            for (int b = 0; b < AmountDataBytes; b++)
             {
                 if (b < bytes.Length - 1 && bytes[b] == StartFlag[0] && bytes[b + 1] == StartFlag[1])
                 {
@@ -57,6 +57,8 @@ namespace COMports
                     frame += b < bytes.Length ? $"{bytes[b]:X2}" : $"{0:X2}";
                 }
             }
+
+            frame += Coding.GetRemain(data);
 
             return frame;
         }
@@ -96,6 +98,10 @@ namespace COMports
                         data += result;
                     }
                 }
+                byte remain = Convert.ToByte(dataFrame.Substring(dataFrame.Length - 2), 16);
+                string remainString = cp866.GetString([remain]);
+                string fixFrame = Coding.FixData(data, remainString);
+
                 temp += data;
             }
 
