@@ -177,6 +177,8 @@ namespace COMports
                 }
 
                 _inputComPort.Write(data);
+                _amountServing++;
+                amountServingLabel.Text = _amountServing.ToString();
 
                 inputTextBox.Clear();
             }
@@ -189,8 +191,11 @@ namespace COMports
             {
                 for (int i = 0; i < frame.Length; i += 2)
                 {
-                    byteStaffingOutput.AppendText(frame.Substring(i, 2) + sp);
-                    if (i != frame.Length - 2 && frame.Substring(i, 2) == ByteStaffingConverter.ReplaceCode.ToString("X"))
+                    if(i == frame.Length - 2)
+                    {
+                        byteStaffingOutput.AppendText(sp + sp + sp + frame.Substring(i, 2));
+                    }
+                    else if (i != frame.Length - 2 && frame.Substring(i, 2) == ByteStaffingConverter.ReplaceCode.ToString("X"))
                     {
                         i += 2;
                         byteStaffingOutput.AppendText(frame.Substring(i, 2) + sp);
@@ -199,6 +204,10 @@ namespace COMports
                         byteStaffingOutput.SelectionColor = Color.Red;
                         byteStaffingOutput.Select(textLength, 0);
                         byteStaffingOutput.SelectionColor = byteStaffingOutput.ForeColor;
+                    }
+                    else
+                    {
+                        byteStaffingOutput.AppendText(frame.Substring(i, 2) + sp);
                     }
                 }
                 byteStaffingOutput.AppendText(Environment.NewLine);
@@ -218,8 +227,6 @@ namespace COMports
                 string dataReceived = _outputComPort.ReadExisting();
                 this.Invoke(new Action(() =>
                 {
-                    _amountServing++;
-                    amountServingLabel.Text = _amountServing.ToString();
                     outputTextBox.Text = ByteStaffingConverter.GetData(dataReceived);
                     outputTextBox.SelectionStart = outputTextBox.Text.Length;
                     outputTextBox.ScrollToCaret();

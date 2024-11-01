@@ -175,7 +175,7 @@
             // 
             amountServingLabel.AutoSize = true;
             amountServingLabel.Font = new Font("Sylfaen", 10.8F, FontStyle.Italic);
-            amountServingLabel.Location = new Point(351, 176);
+            amountServingLabel.Location = new Point(273, 178);
             amountServingLabel.Name = "amountServingLabel";
             amountServingLabel.Size = new Size(19, 23);
             amountServingLabel.TabIndex = 3;
@@ -335,9 +335,9 @@
             label9.Font = new Font("Sylfaen", 10.8F);
             label9.Location = new Point(17, 178);
             label9.Name = "label9";
-            label9.Size = new Size(337, 23);
+            label9.Size = new Size(259, 23);
             label9.TabIndex = 4;
-            label9.Text = "Количество полученных порций символов:";
+            label9.Text = "Количество переданных порций:";
             // 
             // label8
             // 
