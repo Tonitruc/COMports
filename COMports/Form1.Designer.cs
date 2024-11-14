@@ -255,6 +255,8 @@
             byteStaffingOutput.Size = new Size(527, 107);
             byteStaffingOutput.TabIndex = 1;
             byteStaffingOutput.Text = "";
+            byteStaffingOutput.WordWrap = false;
+            byteStaffingOutput.ScrollBars = RichTextBoxScrollBars.Both;
             // 
             // label17
             // 
@@ -405,7 +407,7 @@
             MaximizeBox = false;
             Name = "Form1";
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "Лабораторная работа 2";
+            Text = "Лабораторная работа 4";
             panel1.ResumeLayout(false);
             panel1.PerformLayout();
             panel2.ResumeLayout(false);

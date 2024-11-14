@@ -143,10 +143,11 @@ namespace COMports
             return port;
         }
 
-        private bool channelIsBusy = false;
+        private readonly Dictionary<int, int> amountCollisions = [];
         private int amountAttempts = 0;
+        private const int TickDelay = 50;
 
-        private void Form1_KeyDown(object? sender, KeyEventArgs e)
+        private async void Form1_KeyDown(object? sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
             {
@@ -171,15 +172,46 @@ namespace COMports
                     return;
 
                 var frames = ByteStaffingConverter.CreateFrames(dataToSend, GetComportNumber(_inputComPort.PortName));
-                RecolorReplacesBytes(frames);
 
+                amountCollisions.Clear();
                 string data = string.Empty;
-                foreach (var frame in frames)
-                    data += frame;
+                for(int i = 0; i < frames.Count; i++) 
+                {
+                    while (IsBusy()) { }
+                    amountAttempts = 0;
+                    while (true)
+                    {
+                        if (IsCollision())
+                        {
+                            amountAttempts++;
+                            if(amountAttempts == 17)
+                            {
+                                MessageBox.Show("Сообщение не отправлено");
+                                return;
+                            }
+                            amountCollisions[i] = amountAttempts;
+                            int slotTimes = GetSlotTimes();
+                            await Task.Delay(slotTimes * TickDelay);
+                            continue;
+                        }
+
+                        else
+                            data += frames[i];
+
+                        break;
+                    }
+                }
+
+                RecolorReplacesBytes(frames);
 
                 _inputComPort.Write(data);
                 inputTextBox.Clear();
             }
+        }
+
+        private bool IsBusy()
+        {
+            return _random.Next(100) <= 40;
         }
 
         private bool IsCollision()
@@ -187,22 +219,28 @@ namespace COMports
             return _random.Next(100) <= 60;
         }
 
+        private int GetSlotTimes()
+        {
+            int k = Math.Min(amountAttempts, 10);
+            return _random.Next(0, (int)Math.Pow(2, k) + 1);
+        }
+
         private void RecolorReplacesBytes(List<string> frames, string sp = " ")
         {
             byteStaffingOutput.Clear();
-            foreach (var frame in frames)
+            for (int f = 0; f < frames.Count; f++)
             {
-                for (int i = 0; i < frame.Length; i += 2)
+                for (int i = 0; i < frames[f].Length; i += 2)
                 {
-                    if(i == frame.Length - 2)
-                        byteStaffingOutput.AppendText(sp + sp + frame.Substring(i, 2));
+                    if(i == frames[f].Length - 2)
+                        byteStaffingOutput.AppendText(sp + sp + frames[f].Substring(i, 2));
                     else
-                        byteStaffingOutput.AppendText(frame.Substring(i, 2) + sp);
+                        byteStaffingOutput.AppendText(frames[f].Substring(i, 2) + sp);
 
-                    if (frame.Substring(i, 2) == ByteStaffingConverter.ReplaceCode.ToString("X"))
+                    if (frames[f].Substring(i, 2) == ByteStaffingConverter.ReplaceCode.ToString("X"))
                     {
                         i += 2;
-                        byteStaffingOutput.AppendText(frame.Substring(i, 2) + sp);
+                        byteStaffingOutput.AppendText(frames[f].Substring(i, 2) + sp);
                         int textLength = byteStaffingOutput.TextLength;
                         byteStaffingOutput.Select(textLength - 4 - 2 * sp.Length, 4 + 2 * sp.Length);
                         byteStaffingOutput.SelectionColor = Color.Red;
@@ -210,6 +248,13 @@ namespace COMports
                         byteStaffingOutput.SelectionColor = byteStaffingOutput.ForeColor;
                     }
                 }
+
+                if (amountCollisions.ContainsKey(f))
+                {
+                    for (int i = 0; i < amountCollisions[f]; i++)
+                        byteStaffingOutput.AppendText(sp + "#");
+                }
+
                 byteStaffingOutput.AppendText(Environment.NewLine);
             }
         }
