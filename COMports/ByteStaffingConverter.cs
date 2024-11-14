@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Text;
 
 namespace COMports
 {
@@ -39,24 +40,31 @@ namespace COMports
                 + $"{destinationPort:X2}" + $"{sourcePort:X2}";
 
             Encoding cp866 = Encoding.GetEncoding(866);
-            byte[] bytes = cp866.GetBytes(data);
 
-            for (int b = 0; b <= AmountDataBytes; b++)
+            List<byte> bytesList = Enumerable.Repeat((byte)0x00, 9).ToList();
+            int i = 0;
+            foreach (var b in cp866.GetBytes(data))
+                bytesList[i++] = b;
+
+            for (int b = 0; b < AmountDataBytes; b++)
             {
-                if (b < bytes.Length - 1 && bytes[b] == StartFlag[0] && bytes[b + 1] == StartFlag[1])
+                if (b < bytesList.Count - 1 && bytesList[b] == StartFlag[0] && bytesList[b + 1] == StartFlag[1])
                 {
                     frame += $"{ReplaceCode:X2}5D";
                     b++;
                 }
-                else if (b < bytes.Length && bytes[b] == ReplaceCode)
+                else if (b < bytesList.Count && bytesList[b] == ReplaceCode)
                 {
                     frame += $"{ReplaceCode:X2}5E";
                 }
                 else
                 {
-                    frame += b < bytes.Length ? $"{bytes[b]:X2}" : $"{0:X2}";
+                    frame += b < bytesList.Count ? $"{bytesList[b]:X2}" : $"{0:X2}";
                 }
             }
+
+            var test = Coding.DividePolynomials(Coding.HexBytesToBitArray(bytesList.ToArray()));
+            frame += $"{Coding.BitArrayToByte(test):X2}";
 
             return frame;
         }
@@ -94,8 +102,9 @@ namespace COMports
                         byte hexCode = Convert.ToByte(hexByte, 16);
                         string result = cp866.GetString([hexCode]);
                         data += result;
-                    }
+                    } 
                 }
+                dataFrame = Coding.FixMistake(data, frame[^2..^0]);
                 temp += data;
             }
 

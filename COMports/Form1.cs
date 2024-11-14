@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO.Ports;
@@ -12,6 +13,8 @@ namespace COMports
         private readonly SerialPort _outputComPort;
 
         private int _amountServing = 0;
+
+        private Random _random = new();
 
         public Form1()
         {
@@ -140,6 +143,9 @@ namespace COMports
             return port;
         }
 
+        private bool channelIsBusy = false;
+        private int amountAttempts = 0;
+
         private void Form1_KeyDown(object? sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
@@ -156,30 +162,29 @@ namespace COMports
                         inputTextBox.SelectionLength = 0;
                     }
                     else
-                    {
                         inputTextBox.Clear();
-                    }
+
                     return;
                 }
 
                 if (string.IsNullOrEmpty(dataToSend))
-                {
                     return;
-                }
 
                 var frames = ByteStaffingConverter.CreateFrames(dataToSend, GetComportNumber(_inputComPort.PortName));
                 RecolorReplacesBytes(frames);
 
                 string data = string.Empty;
                 foreach (var frame in frames)
-                {
                     data += frame;
-                }
 
                 _inputComPort.Write(data);
-
                 inputTextBox.Clear();
             }
+        }
+
+        private bool IsCollision()
+        {
+            return _random.Next(100) <= 60;
         }
 
         private void RecolorReplacesBytes(List<string> frames, string sp = " ")
