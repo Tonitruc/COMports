@@ -194,7 +194,11 @@ namespace COMports
             {
                 for (int i = 0; i < frame.Length; i += 2)
                 {
-                    byteStaffingOutput.AppendText(frame.Substring(i, 2) + sp);
+                    if(i == frame.Length - 2)
+                        byteStaffingOutput.AppendText(sp + sp + frame.Substring(i, 2));
+                    else
+                        byteStaffingOutput.AppendText(frame.Substring(i, 2) + sp);
+
                     if (frame.Substring(i, 2) == ByteStaffingConverter.ReplaceCode.ToString("X"))
                     {
                         i += 2;
@@ -250,7 +254,6 @@ namespace COMports
                 {
                     _inputComPort.Open();
                 }
-
             }
         }
 

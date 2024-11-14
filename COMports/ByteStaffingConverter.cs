@@ -81,6 +81,7 @@ namespace COMports
             {
                 string data = string.Empty;
                 string dataFrame = frame[4..^0];
+                //Coding.CreateMistake(Coding.HexBytesToBitArray(cp866.GetBytes(dataFrame[0..^2])));
                 for(int i = 0; i < dataFrame.Length - 2; i+=2)
                 {
                     string hexByte = dataFrame.Substring(i, 2);
@@ -104,7 +105,7 @@ namespace COMports
                         data += result;
                     } 
                 }
-                dataFrame = Coding.FixMistake(data, frame[^2..^0]);
+                data = Coding.FixMistake(data, frame[^2..^0]);
                 temp += data;
             }
 

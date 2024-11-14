@@ -61,9 +61,13 @@ namespace COMports
 
         public static BitArray CreateMistake(BitArray data)
         {
-            Random random = new();
-            int misIndex = random.Next(0, data.Length);
-            data[misIndex] = !data[misIndex];
+            int chance = _random.Next(100);
+
+            if(chance <= 40)
+            {
+                int misIndex = _random.Next(0, data.Length);
+                data[misIndex] = !data[misIndex];
+            }
             return data;
         }
 
