@@ -95,8 +95,8 @@ namespace COMports
             BitArray bitsData = HexBytesToBitArray(cp866.GetBytes(data));
             BitArray fcsData = ByteToBitArray(Convert.ToByte(FCS, 16));
 
-            BitArray remaind = MergeBitArrays(bitsData, fcsData);
-            remaind = DividePolynomials(remaind);
+            BitArray tempData = MergeBitArrays(bitsData, fcsData);
+            BitArray remaind = DividePolynomials(tempData);
 
             if(remaind.Cast<bool>().Count(b => b) == 0)
             {
@@ -106,24 +106,24 @@ namespace COMports
             int amountShift = 0;
             while (true)
             {
-                remaind = DividePolynomials(bitsData);
+                remaind = DividePolynomials(tempData);
 
                 if (remaind.Cast<bool>().Count(b => b) > 1)
                 {
-                    LeftRotate(bitsData);
+                    LeftRotate(tempData);
                     amountShift++;
                 }
                 else
                 {
-                    XorBitArrays(bitsData, remaind);
+                    XorBitArrays(tempData, remaind);
                     for (int i = 0; i < amountShift; i++)
-                        RightRotate(bitsData);
+                        RightRotate(tempData);
 
-                    data = BitArrayToString(bitsData);
+                    BitArray fixData = new(tempData.Cast<bool>().Skip(tempData.Length - Polinom.Length + 1).Take(Polinom.Length - 1).ToArray());
+                    data = BitArrayToString(fixData);
                     break;
                 }
             }
-
             return data;
         }
 

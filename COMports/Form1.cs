@@ -143,9 +143,7 @@ namespace COMports
             return port;
         }
 
-        private readonly Dictionary<int, int> amountCollisions = [];
         private int amountAttempts = 0;
-        private const int TickDelay = 50;
 
         private async void Form1_KeyDown(object? sender, KeyEventArgs e)
         {
@@ -173,41 +171,13 @@ namespace COMports
 
                 var frames = ByteStaffingConverter.CreateFrames(dataToSend, GetComportNumber(_inputComPort.PortName));
 
-                amountCollisions.Clear();
-                string data = string.Empty;
-                for(int i = 0; i < frames.Count; i++) 
-                {
-                    while (IsBusy()) { }
-                    amountAttempts = 0;
-                    while (true)
-                    {
-                        if (IsCollision())
-                        {
-                            amountAttempts++;
-                            if(amountAttempts == 17)
-                            {
-                                MessageBox.Show("Сообщение не отправлено");
-                                return;
-                            }
-                            amountCollisions[i] = amountAttempts;
-                            int slotTimes = GetSlotTimes();
-                            await Task.Delay(slotTimes * TickDelay);
-                            continue;
-                        }
+                await RecolorReplacesBytes(frames);
 
-                        else
-                            data += frames[i];
-
-                        break;
-                    }
-                }
-
-                RecolorReplacesBytes(frames);
-
-                _inputComPort.Write(data);
+                _inputComPort.Write("\x1A");
                 inputTextBox.Clear();
             }
         }
+
 
         private bool IsBusy()
         {
@@ -225,7 +195,7 @@ namespace COMports
             return _random.Next(0, (int)Math.Pow(2, k) + 1);
         }
 
-        private void RecolorReplacesBytes(List<string> frames, string sp = " ")
+        private async Task RecolorReplacesBytes(List<string> frames, string sp = " ")
         {
             byteStaffingOutput.Clear();
             for (int f = 0; f < frames.Count; f++)
@@ -249,15 +219,31 @@ namespace COMports
                     }
                 }
 
-                if (amountCollisions.ContainsKey(f))
+                while (IsBusy()) { }
+                amountAttempts = 0;
+                while (true)
                 {
-                    for (int i = 0; i < amountCollisions[f]; i++)
+                    _inputComPort.Write(frames[f]);
+                    await Task.Delay(100);
+                    if (IsCollision())
+                    {
+                        if (amountAttempts++ == 17)
+                            break;
+
                         byteStaffingOutput.AppendText(sp + "#");
+                        await Task.Delay(GetSlotTimes());
+                        continue;
+                    }
+                    break;
                 }
 
                 byteStaffingOutput.AppendText(Environment.NewLine);
             }
         }
+
+        private bool _needClear = false;
+
+        string data = string.Empty;
 
         private void DataReceivedHandler(object sender,
             SerialDataReceivedEventArgs e)
@@ -270,14 +256,32 @@ namespace COMports
             if (_outputComPort.BytesToRead > 0)
             {
                 string dataReceived = _outputComPort.ReadExisting();
+
                 this.Invoke(new Action(() =>
                 {
-                    _amountServing++;
                     amountServingLabel.Text = _amountServing.ToString();
-                    outputTextBox.Text = ByteStaffingConverter.GetData(dataReceived);
+                    if(_needClear)
+                    {
+                        outputTextBox.Clear();
+                        _needClear = false;
+                    }
+
+                    if (dataReceived.Contains('\x1A'))
+                    {
+                        _needClear = true;
+                        //outputTextBox.Text = data;
+                        data = string.Empty;
+                    }
+                    else
+                    {
+                        outputTextBox.Text += ByteStaffingConverter.GetData(dataReceived);
+                        _amountServing++;
+                    }
                     outputTextBox.SelectionStart = outputTextBox.Text.Length;
                     outputTextBox.ScrollToCaret();
                 }));
+
+
             }
         }
 

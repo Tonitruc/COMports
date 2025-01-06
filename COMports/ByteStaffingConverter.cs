@@ -109,7 +109,7 @@ namespace COMports
                 temp += data;
             }
 
-            return temp;
+            return temp.Replace("\0", "");
         }
     }
 }
